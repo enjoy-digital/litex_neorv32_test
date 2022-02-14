@@ -71,7 +71,24 @@ class NEORV32(CPU):
 
     @staticmethod
     def add_sources(platform):
-        pass
+        sources = [
+            "neorv32_package.vhd",                  # Main CPU & Processor package file.
+            "neorv32_cpu.vhd",                      # CPU top entity.
+                "neorv32_cpu_alu.vhd",              # Arithmetic/logic unit.
+                    "neorv32_cpu_cp_bitmanip.vhd",  # Bit-manipulation co-processor.
+                    "neorv32_cpu_cp_cfu.vhd",       # Custom instructions co-processor.
+                    "neorv32_cpu_cp_fpu.vhd",       # Single-precision FPU co-processor.
+                    "neorv32_cpu_cp_muldiv.vhd",    # Integer multiplier/divider co-processor.
+                    "neorv32_cpu_cp_shifter.vhd",   # Base ISA shifter unit.
+                "neorv32_cpu_bus.vhd",              # Instruction and data bus interface unit.
+                "neorv32_cpu_control.vhd",          # CPU control and CSR system.
+                    "neorv32_cpu_decompressor.vhd", # Compressed instructions decoder.
+                "neorv32_cpu_regfile.vhd",          # Data register file.
+        ]
+        os.makedirs("rtl", exist_ok=True)
+        for source in sources:
+            if not os.path.exists(f"rtl/{source}"):
+                os.system(f"wget https://raw.githubusercontent.com/stnolting/neorv32/main/rtl/core/{source} -P rtl")
 
     def do_finalize(self):
         assert hasattr(self, "reset_address")
