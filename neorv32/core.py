@@ -62,7 +62,7 @@ class NEORV32(CPU):
 
         class Open(Signal) : pass
 
-        # IBus Adaptations.
+        # IBus Adaptations. FIXME: Works but not optimal (latency).
         ibus_we = Signal()
         ibus_re = Signal()
         self.sync += [
@@ -79,7 +79,7 @@ class NEORV32(CPU):
             )
         ]
 
-        # DBus Adaptations.
+        # DBus Adaptations. FIXME: Works but not optimal (latency).
         dbus_we = Signal()
         dbus_re = Signal()
         self.sync += [
