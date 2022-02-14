@@ -71,6 +71,7 @@ class NEORV32(CPU):
 
     @staticmethod
     def add_sources(platform):
+        # List VHDL sources.
         sources = [
             "neorv32_package.vhd",                  # Main CPU & Processor package file.
             "neorv32_cpu.vhd",                      # CPU top entity.
@@ -85,10 +86,28 @@ class NEORV32(CPU):
                     "neorv32_cpu_decompressor.vhd", # Compressed instructions decoder.
                 "neorv32_cpu_regfile.vhd",          # Data register file.
         ]
+
+        # Download VHDL sources (if not already present).
         os.makedirs("rtl", exist_ok=True)
         for source in sources:
             if not os.path.exists(f"rtl/{source}"):
                 os.system(f"wget https://raw.githubusercontent.com/stnolting/neorv32/main/rtl/core/{source} -P rtl")
+
+        # Convert VHDL to Verilog through GHDL/Yosys.
+        from litex.build import tools
+        import subprocess
+        cdir = os.path.dirname(__file__)
+        ys = []
+        ys.append("ghdl --ieee=synopsys -fexplicit -frelaxed-rules --std=08 \\")
+        for source in sources:
+            ys.append(os.path.join("rtl", source) + " \\")
+        ys.append("-e neorv32_cpu")
+        ys.append("chformal -assert -remove")
+        ys.append("write_verilog {}".format(os.path.join(cdir, "neorv32.v")))
+        tools.write_to_file(os.path.join(cdir, "neorv32.ys"), "\n".join(ys))
+        if subprocess.call(["yosys", "-q", "-m", "ghdl", os.path.join(cdir, "neorv32.ys")]):
+            raise OSError("Unable to convert NEORV32 CPU to verilog, please check your GHDL-Yosys-plugin install.")
+        platform.add_source(os.path.join(cdir, "neorv32.v"))
 
     def do_finalize(self):
         assert hasattr(self, "reset_address")
