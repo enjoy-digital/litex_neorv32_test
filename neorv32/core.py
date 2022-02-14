@@ -85,6 +85,7 @@ class NEORV32(CPU):
                 "neorv32_cpu_control.vhd",          # CPU control and CSR system.
                     "neorv32_cpu_decompressor.vhd", # Compressed instructions decoder.
                 "neorv32_cpu_regfile.vhd",          # Data register file.
+            "neorv32_cpu_wrapper.vhd",              # CPU top entity + default generics.
         ]
 
         # Download VHDL sources (if not already present).
@@ -98,10 +99,10 @@ class NEORV32(CPU):
         import subprocess
         cdir = os.path.dirname(__file__)
         ys = []
-        ys.append("ghdl --ieee=synopsys -fexplicit -frelaxed-rules --std=08 \\")
+        ys.append("ghdl --ieee=synopsys -fexplicit -frelaxed-rules --std=08 --work=neorv32 \\")
         for source in sources:
             ys.append(os.path.join("rtl", source) + " \\")
-        ys.append("-e neorv32_cpu")
+        ys.append("-e neorv32_cpu_wrapper")
         ys.append("chformal -assert -remove")
         ys.append("write_verilog {}".format(os.path.join(cdir, "neorv32.v")))
         tools.write_to_file(os.path.join(cdir, "neorv32.ys"), "\n".join(ys))
