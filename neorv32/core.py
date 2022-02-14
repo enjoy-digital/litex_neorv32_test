@@ -65,7 +65,13 @@ class NEORV32(CPU):
         # IBus Adaptations.
         ibus_we = Signal()
         ibus_re = Signal()
-        self.comb += [
+        self.sync += [
+            # Clear Cyc/Stb on Ack.
+            If(ibus.ack,
+                ibus.cyc.eq(0),
+                ibus.stb.eq(0),
+            ),
+            # Set Cyc/Stb on We/Re.
             If(ibus_we | ibus_re,
                 ibus.cyc.eq(1),
                 ibus.stb.eq(1),
@@ -76,7 +82,13 @@ class NEORV32(CPU):
         # DBus Adaptations.
         dbus_we = Signal()
         dbus_re = Signal()
-        self.comb += [
+        self.sync += [
+            # Clear Cyc/Stb on Ack.
+            If(dbus.ack,
+                dbus.cyc.eq(0),
+                dbus.stb.eq(0),
+            ),
+            # Set Cyc/Stb on We/Re.
             If(dbus_we | dbus_re,
                 dbus.cyc.eq(1),
                 dbus.stb.eq(1),
@@ -128,15 +140,6 @@ class NEORV32(CPU):
             i_mtime_irq_i   = 0, # FIXME.
             i_firq_i        = 0  # FIXME.
         )
-
-        # Debug: Early Finish.
-        finish_cnt = Signal(32, reset=1000)
-        self.sync += [
-            finish_cnt.eq(finish_cnt - 1),
-            If(finish_cnt == 0,
-                Finish()
-            )
-        ]
 
         # Add Verilog sources
         self.add_sources(platform)
