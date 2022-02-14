@@ -5,3 +5,9 @@ NEORV32 integration test with LiteX.
 ````
 $ litex_sim --cpu-type=neorv32
 ````
+
+[> Build/Run it on Nexys-Video
+------------------------------
+````
+$ python3 -m litex_boards.targets.digilent_nexys_video --cpu-type=neorv32 --uart-name=usb_fifo --build --load
+````
