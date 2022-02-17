@@ -1,5 +1,7 @@
 NEORV32 integration test with LiteX.
 
+**2022-02-17: Now directly integrated in LiteX!**
+
 [> Run Simulation
 -----------------
 ````
